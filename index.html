@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Interdepartmental Volleyball Tournament</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body, html { width: 100%; height: 100%; overflow: hidden; }
+    iframe { width: 100%; height: 100%; border: none; }
+    .external-fullscreen {
+        position: fixed;
+        top: 0px;
+        right: 0px;
+        background: rgb(0 0 0 / 0%);
+        backdrop-filter: blur(4px);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        font-size: 10px;
+        cursor: pointer;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+    .external-fullscreen:hover { background: #007bff; transform: scale(1.05); }
+    /* Temporary overlay to capture first click on iframe area */
+    .click-capture-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      z-index: 10000;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <iframe id="launcherIframe" 
+    src=""
+    referrerpolicy="no-referrer"
+    allowfullscreen
+    allow="fullscreen">
+  </iframe>
+  <button id="externalFullscreenBtn" class="external-fullscreen" title="Full screen">⤢</button>
+  <!-- Temporary overlay for first click -->
+  <div id="firstClickOverlay" class="click-capture-overlay"></div>
+
+  <script>
+    const baseUrl = 'https://script.google.com/macros/s/AKfycbzdZTlGgiadg5Kzm2Szl2CN1GvH_n7Vi5zMNCNu3kzsEXiS81Mu1nZpF5UltyCw0iug/exec';
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+    const iframe = document.getElementById('launcherIframe');
+    iframe.src = isMobile ? baseUrl + '?mode=mobile' : baseUrl;
+
+    const btn = document.getElementById('externalFullscreenBtn');
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(console.warn);
+      } else {
+        document.exitFullscreen();
+      }
+    }
+    btn.addEventListener('click', toggleFullscreen);
+
+    document.addEventListener('fullscreenchange', () => {
+      btn.textContent = document.fullscreenElement ? '✕' : '⤢';
+      btn.title = document.fullscreenElement ? 'Exit full screen' : 'Full screen';
+    });
+
+    // --- First click anywhere (captured by overlay) ---
+    const overlay = document.getElementById('firstClickOverlay');
+    overlay.addEventListener('click', function onFirstClick() {
+      // Remove overlay immediately
+      overlay.removeEventListener('click', onFirstClick);
+      overlay.remove();
+      // Enter full‑screen
+      document.documentElement.requestFullscreen().catch(console.warn);
+    });
+    // Also for touch devices
+    overlay.addEventListener('touchstart', function onFirstTouch() {
+      overlay.removeEventListener('touchstart', onFirstTouch);
+      overlay.remove();
+      document.documentElement.requestFullscreen().catch(console.warn);
+    });
+  </script>
+</body>
+</html>
